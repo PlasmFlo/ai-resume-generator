@@ -1,16 +1,20 @@
 from flask import Flask, render_template, request, make_response, session, send_file, redirect, url_for
 from engine import generate_resume
-import pdfkit
-import os
+import os, platform
 import stripe
+from weasyprint import HTML
 from dotenv import load_dotenv
 import json
+from xhtml2pdf import pisa              
+from io import BytesIO
+import io
+
+
+
+
 
 load_dotenv()
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-
-config = pdfkit.configuration(wkhtmltopdf=r'C:\Users\Isaiah Davis\Downloads\wkhtmltox-0.12.6-1.mxe-cross-win64\wkhtmltox\bin\wkhtmltopdf.exe')  # change this path if yours is different
-
 
 
 
@@ -64,6 +68,21 @@ def home():
     
     # First time loading page
     return render_template('index.html')
+  
+@app.route('/generate', methods=['POST'])
+def generate_resume():
+    name = request.form['name']
+    email = request.form['email']
+    summary = request.form['summary']
+
+    rendered_html = render_template('resume_template.html', name=name, email=email, summary=summary)
+
+    result = BytesIO()
+    pisa.CreatePDF(rendered_html, dest=result)
+
+    result.seek(0)
+    return send_file(result, as_attachment=True, download_name="resume.pdf", mimetype='application/pdf')
+
   
   
 @app.route("/", methods=["GET", "POST"])
@@ -178,11 +197,20 @@ def build_pro_resume_html(name, summary, bullets):
     </html>
     """
     
+def generate_pdf(html_string):
+  result = BytesIO()
+  pisa.CreatePDF(html, dest=result)
+  with open("output.pdf", "wb") as f:
+    f.write(result.getvalue())
     
+  ''  
     
-    
-    
-    
+def convert_html_to_pdf(source_html):
+    result = io.BytesIO()
+    pdf = pisa.pisaDocument(io.StringIO(source_html), result)
+    if not pdf.err:
+        return result.getvalue()
+    return None 
     
     
 if __name__ == '__main__':

@@ -1,0 +1,25 @@
+{
+  "Contact Information":{
+    "Name": "Isaiah Davis",
+    "Email": "plasmflo@gmail.com",
+    "Phone": "903-707-3718"
+  },
+  "Professional Summary": "Driven software engineer with 1 year of experience programming and building apps.",
+  "Work Experience": [
+    {
+      "Company": "None",
+      "Title": "Python Programmer, Soft Engineer, Cyber Security Specialist",
+      "Start Date": "2024-02",
+      "Responsibilities": "Built Automated programs and web apps to automate tasks and improve workflow.",
+      "Metrics": "Reduced load time by 40%"
+    }
+  ],
+  "Skills": ["Python", "JavaScript", "React", "Git"],
+  "Education": [
+    {
+      "School": "None",
+      "Degree": "None",
+      "Graduation Year": "2025"
+    }
+  ]
+}
