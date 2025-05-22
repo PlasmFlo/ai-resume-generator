@@ -54,6 +54,25 @@ def generate_summary(data):
   )
   return resp.choices[0].message.content.strip()
 
+def generate_resume(form_data):
+    # Sample HTML resume template (simplified)
+    name = form_data.get('name', 'No Name')
+    email = form_data.get('email', 'No Email')
+    summary = form_data.get('summary', '')
+    skills = form_data.get('skills', '')
+    experience = form_data.get('experience', '')
+
+    return f"""
+    <h1>{name}</h1>
+    <p><strong>Email:</strong> {email}</p>
+    <h2>Summary</h2>
+    <p>{summary}</p>
+    <h2>Skills</h2>
+    <p>{skills}</p>
+    <h2>Experience</h2>
+    <p>{experience}</p>
+    """
+
 if __name__ == "__main__":
   data = parse_json("sample_resume.json")
   print("=== Summary ===")
