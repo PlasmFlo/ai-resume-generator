@@ -1,0 +1,26 @@
+{
+  "Contact Information":{
+    "Name": "John Doe",
+    "Email": "john.doe@example.com",
+    "Phone": "555-1234"
+  },
+  "Professional Summary": "Driven software engineer with 3 years of experience building scalable webs apps.",
+  "Work Experience": [
+    {
+      "Company": "Acme Corp",
+      "Title": "Frontend Developer",
+      "Start Date": "2021-03",
+      "End Date": "2024-06",
+      "Responsibilities": "Built React UIs, optimized performance",
+      "Metrics": "Reduced load time by 40%"
+    }
+  ],
+  "Skills": ["Python", "JavaScript", "React", "Git"],
+  "Education": [
+    {
+      "School": "State University",
+      "Degree": "B.Sc. Computer Science",
+      "Graduation Year": "2021"
+    }
+  ]
+}
