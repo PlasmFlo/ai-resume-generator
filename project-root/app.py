@@ -49,39 +49,33 @@ def home():
 
 # === Process Form & Generate PDF ===
 @app.route("/generate-resume", methods=["POST"])
-def generate_pdf(data):
-    data = {
-        "name": request.form.get("name", ""),
-        "job_title": request.form.get("job_title", ""),
-        "summary": request.form.get("summary", ""),
-        "experience": request.form.get("experience", ""),
-        "skills": request.form.get("skills", ""),
-        "education": request.form.get("education", "")
-    }
-    
-    summary = data.get("summary", "")
-    experience = data.get("experience", "")
-    skills = data.get("skills", "")
-
-    bullet_points = [
-        f"Demonstrated {skill.strip()} in professional settings"
-        for skill in skills.split(",") if skill.strip()
-    ]
-
-    return summary, bullet_points
-
-     
+def generate_resume():
+    name = request.form.get("name", "")
+    job_title = request.form.get("job_title", "")
+    summary = request.form.get("summary", "")
+    experience = request.form.get("experience", "")
+    skills = request.form.get("skills", "")
+    education = request.form.get("education", "")
 
     html = render_template(
         "resume_template.html",
-        name=data["name"],
-        job_title=data["job_title"],
+        name=name,
+        job_title=job_title,
         summary=summary,
-        experience=data["experience"],
-        skills=data["skills"],
-        education=data["education"],
-        bullet_points=bullet_points  # If you're using it
+        experience=experience,
+        skills=skills,
+        education=education
     )
+
+    from xhtml2pdf import pisa
+    import io
+
+    def convert_html_to_pdf(source_html):
+        result = io.BytesIO()
+        pdf = pisa.pisaDocument(io.StringIO(source_html), result)
+        if not pdf.err:
+            return result.getvalue()
+        return None
 
     pdf = convert_html_to_pdf(html)
 

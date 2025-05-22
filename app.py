@@ -51,7 +51,7 @@ def home():
     return render_template("index.html")
 
   
-@app.route('/generate', methods=['POST'])
+@app.route('/generate-resume', methods=['POST'])
 def generate_pdf(data):
     name = data.get("name", "")
     experience = data.get("experience", "")
