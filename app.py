@@ -229,6 +229,29 @@ def convert_html_to_pdf(source_html):
     
 import os
 
+
+from xhtml2pdf import pisa
+
+def generate_pdf(data):
+    from flask import render_template
+    import io
+
+    html = render_template(
+        "resume_template.html",
+        name=data["name"],
+        email=data["email"],
+        summary=data["summary"],
+        experience=data["experience"],
+        skills=data["skills"],
+        education=data["education"]
+    )
+
+    result = io.BytesIO()
+    pisa.CreatePDF(io.StringIO(html), dest=result)
+    result.seek(0)
+    return result
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Use PORT env var or fallback to 5000
     app.run(debug=True, host='0.0.0.0', port=port)
