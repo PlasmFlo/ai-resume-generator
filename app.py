@@ -24,14 +24,14 @@ app = Flask(__name__) # create the app
 
 app.secret_key = 'plasm-secret-key'
 
-@app.route('/', methods=['GET', 'POST']) # homepage route
+@app.route('/', methods=['GET', 'POST'])
 def home():
-     if request.method == 'POST':
-        name = request.form.get('name') 
-        experience = request.form.get('experience')
-        email = request.form.get("email")
-        education = request.form.get('education')
-        skills = request.form.get('skills')
+    if request.method == 'POST':
+        name = request.form.get('name', '') 
+        experience = request.form.get('experience', '')
+        email = request.form.get("email", '')
+        education = request.form.get('education', '')
+        skills = request.form.get('skills', '')
 
         data = {
             "name": name,
@@ -40,19 +40,16 @@ def home():
             "education": education
         }
 
-        print("Final data sent to engine:", data)
-        summary, bullets_points = generate_resume(data)
+        try:
+            summary, bullet_points = generate_resume(data)
+            return render_template("index.html", summary=summary, bullet_points=bullet_points, data=data)
+        except Exception as e:
+            print(f"Resume generation failed: {e}")
+            return render_template("index.html", error="Resume generation failed.", data=data)
 
-        return render_template(
-            'resume_template.html',
-            name=name,
-            email=email,
-            experience=experience,
-            summary=summary,
-            bullets=bullets_points
-        )
+    # Handle GET requests
+    return render_template("index.html")
 
-        return render_template('index.html')
   
 @app.route('/generate', methods=['POST'])
 def generate_pdf(data):
