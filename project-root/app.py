@@ -19,37 +19,57 @@ def index(data):
     return render_template("index.html")
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def home():
-    if request.method == 'POST':
-        name = request.form.get('name', '') 
-        experience = request.form.get('experience', '')
-        email = request.form.get("email", '')
-        education = request.form.get('education', '')
-        skills = request.form.get('skills', '')
+    if request.method == "POST":
+        # Extract form data safely
+        name = request.form.get("name", "")
+        email = request.form.get("email", "")
+        summary = request.form.get("summary", "")
+        experience = request.form.get("experience", "")
+        skills = request.form.get("skills", "")
+        education = request.form.get("education", "")
 
+        # Pack into data dictionary
         data = {
             "name": name,
+            "email": email,
+            "summary": summary,
             "experience": experience,
             "skills": skills,
             "education": education
         }
 
         try:
+            # Call your AI resume generation engine (imported from engine.py)
             summary, bullet_points = generate_resume(data)
+
+            # Optionally attach summary/bullets to data
+            data["summary"] = summary
+            data["bullet_points"] = bullet_points
+
+            # Generate PDF from data
+            pdf = generate_pdf(data)
+
+            return send_file(
+                pdf,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name="resume.pdf"
+            )
+
         except Exception as e:
-            print(f"Resume generation failed: {e}")
+            print(f"Error generating resume: {e}")
             return render_template("index.html", error="Resume generation failed.")
 
-        return render_template("index.html", summary=summary, bullet_points=bullet_points, data=data)
-
-    # Handle GET requests
+    # Handle GET
     return render_template("index.html")
+
 
 
 # === Process Form & Generate PDF ===
 @app.route("/generate-resume", methods=["POST"])
-def generate_resume():
+def generate_pdf():
     name = request.form.get("name", "")
     job_title = request.form.get("job_title", "")
     summary = request.form.get("summary", "")
@@ -76,6 +96,17 @@ def generate_resume():
         if not pdf.err:
             return result.getvalue()
         return None
+
+    data = {
+    "name": request.form.get("name", ""),
+    "email": request.form.get("email", ""),
+    "summary": request.form.get("summary", ""),
+    "experience": request.form.get("experience", ""),
+    "skills": request.form.get("skills", ""),
+    "education": request.form.get("education", "")
+}
+
+    pdf = generate_pdf(data)
 
     pdf = convert_html_to_pdf(html)
 
