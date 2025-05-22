@@ -1,6 +1,7 @@
 import os 
 import sys
 from dotenv import load_dotenv  
+import openai
 from openai import OpenAI
 from parser import parse_json 
 
@@ -12,11 +13,8 @@ load_dotenv()
 # Get the directory where the script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Set API key directly
-api_key = "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"
-
-# Initialize OpenAI client
-client = OpenAI(api_key=api_key)
+openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai
 
 def generate_experience_bullet(exp_entry):
   """ 
@@ -121,7 +119,8 @@ if __name__ == "__main__":
 
   # PDF EXPORT
   import pdfkit
-  config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+  config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+
 
   html_template = f"""
   <!DOCTYPE html>
