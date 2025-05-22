@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> AI Resume Generator </title>
+  </head>
+  <body>
+    <h1> AI Resume Generator </h1>
+    
+    <form method="POST">
+      <label>Full Name:</label><br>
+      <input typee="text" name="name" required><br><br>
+
+      <label>Work Experience:</label><br>
+      <textarea name="experience" required></textarea><br><br>
+
+      <label>Skills:</label><br>
+      <textarea name="skills" required></textarea><br><br>
+
+      <label>Education:</label><br>
+      <textarea name="education" required></textarea><br><br>
+      
+      <button type="submit">Generate Resume</button>
+    </form>
+
+
+    <form method="POST" actiions="/download-pdf">
+      <input type="hidden" name="name" value="{{ data.name }}">
+      <input type="hidden" name="experience" value="{{ data.experience }}">
+      <input type="hidden" name="skills" value="{{ data.skills }}">
+      <input type="hidden" name="education" value="{{ data.education }}">
+      <button type="submit">Download as PDF</button>
+    </form>
+
+
+    {% if summary %}
+      <h2>Generated Summary:</h2>
+      <p>{{ summary }}</p>
+
+      <h3>Key Bullet Points:</h3>
+      <ul>
+        {% for bullet in bullets %}
+         <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </body>
+</html>
+    
