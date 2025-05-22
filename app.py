@@ -8,8 +8,8 @@ import json
 from xhtml2pdf import pisa              
 from io import BytesIO
 import io
-
-
+import openai
+from engine import generate_resume
 
 
 
@@ -26,67 +26,84 @@ app.secret_key = 'plasm-secret-key'
 
 @app.route('/', methods=['GET', 'POST']) # homepage route
 def home():
-    if request.method == 'POST':
-      # Get form data from user input
-      name = request.form.get('name') 
-      experience = request.form.get('experience')
-      email = request.form.get("email")
-      education = request.form.get('education')
-      print(request.form)
-      
-      # Prepare the data for resume engine 
-      data = {
-        "name": request.form.get('name', ''),
-        "experience": request.form.get('experience', ''),
-        "skilss": request.form.get('skills', ''),
-        "education": request.form.get('education', '')
-      }
-      
-      print("Final data sent to engine:", data) # Add this debug
-      
-      # Call your resume generation function
-      print("Received form data:", request.form)
-      summary, bullets_points = generate_resume(data)
-      
-      rendered = render_template('resume_template.html', name=name, email=email, experience=experience)
-      
-      pdf = pdfkit.from_string(rendered, False, configuration=config)
-      
-      response = make_response(pdf)
-      response.headers['Content-Type'] = 'application/pdf'
-      response.headers['Content-Disponsition'] = 'attachment; filename=resume.pdf'
-      
-      return response
-    
-      return send_file(io.BytesIO(pdf), download_name="resume.pdf", as_attachment=True)
-    
-    
-    
-    
-      # Render the HTML with the results
-      return render_template('index.html', summary=summary, bullets_points=bullets_points, data=data)
-    
-    # First time loading page
-    return render_template('index.html')
+     if request.method == 'POST':
+        name = request.form.get('name') 
+        experience = request.form.get('experience')
+        email = request.form.get("email")
+        education = request.form.get('education')
+        skills = request.form.get('skills')
+
+        data = {
+            "name": name,
+            "experience": experience,
+            "skills": skills,
+            "education": education
+        }
+
+        print("Final data sent to engine:", data)
+        summary, bullets_points = generate_resume(data)
+
+        return render_template(
+            'resume_template.html',
+            name=name,
+            email=email,
+            experience=experience,
+            summary=summary,
+            bullets=bullets_points
+        )
+
+        return render_template('index.html')
   
 @app.route('/generate', methods=['POST'])
-def generate_resume():
-    name = request.form['name']
-    email = request.form['email']
-    summary = request.form['summary']
+def generate_pdf(data):
+    name = data.get("name", "")
+    experience = data.get("experience", "")
+    skills = data.get("skills", "")
+    education = data.get("education", "")
 
-    rendered_html = render_template('resume_template.html', name=name, email=email, summary=summary)
+    prompt = f"""
+You are an expert resume writer. Based on the following information, create:
 
-    result = BytesIO()
-    pisa.CreatePDF(rendered_html, dest=result)
+1. A concise professional summary (2-4 sentences).
+2. 3-5 strong bullet points highlighting the person's experience and skills.
 
-    result.seek(0)
-    return send_file(result, as_attachment=True, download_name="resume.pdf", mimetype='application/pdf')
+Name: {name}
+Experience: {experience}
+Skills: {skills}
+Education: {education}
+
+Output in this format:
+SUMMARY:
+[Summary]
+
+BULLETS:
+- [Point 1]
+- [Point 2]
+- [Point 3]
+"""
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7,
+        max_tokens=300,
+    )
+
+    content = response['choices'][0]['message']['content']
+
+    # Split the result into summary and bullet points
+    summary_section = content.split("BULLETS:")[0].replace("SUMMARY:", "").strip()
+    bullets_section = content.split("BULLETS:")[1].strip().split("\n")
+
+    bullets = [point.strip("- ").strip() for point in bullets_section if point.strip()]
+
+    return summary_section, bullets
+
 
   
   
 @app.route("/", methods=["GET", "POST"])
-def index():
+def index(data):
   # Initialize resume_count for new users
   if 'resume_count' not in session:
     session['resume_count'] = 0
@@ -112,7 +129,7 @@ def index():
   
   
 @app.route("/create-checkout-session", methods=["POST"])
-def create_checkout_session():
+def create_checkout_session(data):
   session = stripe.checkout.Session.create(
     payment_method_types=["card"],
     line_items=[{
@@ -132,7 +149,7 @@ def create_checkout_session():
 
 
 @app.route("/pro", methods=["GET", "POST"])
-def pro():
+def pro(data):
   if request.method == "POST":
     uploaded_file = request.files["resume"]
     if uploaded_file.filename != "":
