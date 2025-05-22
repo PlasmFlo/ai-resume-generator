@@ -17,6 +17,15 @@ def convert_html_to_pdf(source_html):
 def index():
     return render_template("index.html")
 
+
+@app.route('/')
+def home():
+    data = {
+        "name": "Plasm",  # or pull this from a form/session/db later
+    }
+    return render_template('index.html', data=data)
+
+
 # === Process Form & Generate PDF ===
 @app.route("/generate-resume", methods=["POST"])
 def generate_resume():

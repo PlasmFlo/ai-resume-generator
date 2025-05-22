@@ -24,10 +24,10 @@
 
 
     <form method="POST" actiions="/download-pdf">
-      <input type="hidden" name="name" value="{{ data.name }}">
-      <input type="hidden" name="experience" value="{{ data.experience }}">
-      <input type="hidden" name="skills" value="{{ data.skills }}">
-      <input type="hidden" name="education" value="{{ data.education }}">
+      <input type="hidden" name="name" value="{{ data.name if data else '' }}">
+      <input type="hidden" name="experience" value="{{ data.experience if data else '' }}">
+      <input type="hidden" name="skills" value="{{ data.skills if data else '' }}">
+      <input type="hidden" name="education" value="{{ data.education if data else '' }}">
       <button type="submit">Download as PDF</button>
     </form>
 
