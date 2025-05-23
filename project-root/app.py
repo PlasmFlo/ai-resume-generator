@@ -49,7 +49,7 @@ def home():
             data["bullet_points"] = bullet_points
 
             # Generate PDF from data
-            pdf = generate_pdf(data)
+            pdf = generate_resume_pdf(data)
 
             return send_file(
                 pdf,
@@ -137,7 +137,7 @@ def health_check(data):
 from xhtml2pdf import pisa
 
 
-
+import os
 
 
 if __name__ == '__main__':
