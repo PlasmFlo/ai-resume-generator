@@ -69,7 +69,7 @@ def home():
 
 # === Process Form & Generate PDF ===
 @app.route("/generate-resume", methods=["POST"])
-def generate_pdf():
+def generate_resume_pdf(data):
     name = request.form.get("name", "")
     job_title = request.form.get("job_title", "")
     summary = request.form.get("summary", "")
@@ -79,13 +79,17 @@ def generate_pdf():
 
     html = render_template(
         "resume_template.html",
-        name=name,
-        job_title=job_title,
-        summary=summary,
-        experience=experience,
-        skills=skills,
-        education=education
+        name=data["name"],
+        email=data["email"],
+        summary=data["summary"],
+        experience=data["experience"],
+        skills=data["skills"],
+        education=data["education"]
     )
+    result = io.BytesIO()
+    pisa.CreatePDF(io.StringIO(html), dest=result)
+    result.seek(0)
+    return result
 
     from xhtml2pdf import pisa
     import io
@@ -106,7 +110,7 @@ def generate_pdf():
     "education": request.form.get("education", "")
 }
 
-    pdf = generate_pdf(data)
+    pdf = generate_resume_pdf(data)
 
     pdf = convert_html_to_pdf(html)
 
@@ -130,6 +134,9 @@ def health_check(data):
 
 
    
+from xhtml2pdf import pisa
+
+
 
 
 
